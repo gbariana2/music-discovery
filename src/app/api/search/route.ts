@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const MUSICBRAINZ_BASE = "https://musicbrainz.org/ws/2";
-const USER_AGENT = "MusicDiscovery/1.0 (gbariana@uchicago.edu)";
+const USER_AGENT = "MusicMadness/1.0 (gbariana@uchicago.edu)";
+
+// Pattern to match featured artist naming: "Artist feat. Other", "Artist ft. Other", etc.
+const FEAT_PATTERN = /\b(feat\.?|ft\.?|featuring)\b/i;
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -28,5 +31,13 @@ export async function GET(request: NextRequest) {
   }
 
   const data = await response.json();
+
+  // Filter out "feat." / "ft." artists from artist search results
+  if (type === "artist" && Array.isArray(data.artists)) {
+    data.artists = data.artists.filter(
+      (artist: { name: string }) => !FEAT_PATTERN.test(artist.name)
+    );
+  }
+
   return NextResponse.json(data);
 }

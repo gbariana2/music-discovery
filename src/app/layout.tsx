@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Music Discovery",
+  title: "Music Madness",
   description:
     "Discover new music - search artists and albums, build your listening list, and rate what you hear.",
 };
@@ -28,19 +28,19 @@ export default function RootLayout({
     <ClerkProvider
       appearance={{
         variables: {
-          colorPrimary: "#8b5cf6",
-          colorBackground: "#18181b",
-          colorText: "#f4f4f5",
-          colorInputBackground: "#27272a",
-          colorInputText: "#f4f4f5",
+          colorPrimary: "#d97706",
+          colorBackground: "#faf7f2",
+          colorText: "#1c1917",
+          colorInputBackground: "#ffffff",
+          colorInputText: "#1c1917",
         },
       }}
     >
       <html
         lang="en"
-        className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
+        className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       >
-        <body className="min-h-full flex flex-col bg-zinc-950 text-zinc-100">
+        <body className="min-h-full flex flex-col bg-[#faf7f2] text-stone-900">
           {children}
         </body>
       </html>

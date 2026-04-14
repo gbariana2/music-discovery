@@ -16,8 +16,8 @@ export default function StarRating({ rating, onRate, disabled }: StarRatingProps
           disabled={disabled}
           className={`text-lg transition-colors ${
             rating && star <= rating
-              ? "text-amber-400"
-              : "text-zinc-600 hover:text-amber-400/60"
+              ? "text-amber-500"
+              : "text-stone-300 hover:text-amber-400/60"
           } disabled:cursor-not-allowed`}
         >
           ★

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const MUSICBRAINZ_BASE = "https://musicbrainz.org/ws/2";
-const USER_AGENT = "MusicDiscovery/1.0 (gbariana@uchicago.edu)";
+const USER_AGENT = "MusicMadness/1.0 (gbariana@uchicago.edu)";
 
 export async function GET(
   request: NextRequest,
