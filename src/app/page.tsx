@@ -1,63 +1,126 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import Navbar from "@/components/Navbar";
+import SearchBar from "@/components/SearchBar";
+import ArtistCard from "@/components/ArtistCard";
+import AlbumCard from "@/components/AlbumCard";
+import { MusicBrainzArtist, MusicBrainzRelease } from "@/lib/types";
 
 export default function Home() {
+  const [artists, setArtists] = useState<MusicBrainzArtist[]>([]);
+  const [releases, setReleases] = useState<MusicBrainzRelease[]>([]);
+  const [searchType, setSearchType] = useState<"artist" | "release">("artist");
+  const [loading, setLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
+
+  const handleSearch = async (query: string, type: "artist" | "release") => {
+    setLoading(true);
+    setSearchType(type);
+    setHasSearched(true);
+
+    try {
+      const res = await fetch(
+        `/api/search?q=${encodeURIComponent(query)}&type=${type}`
+      );
+      const data = await res.json();
+
+      if (type === "artist") {
+        setArtists(data.artists || []);
+        setReleases([]);
+      } else {
+        setReleases(data.releases || []);
+        setArtists([]);
+      }
+    } catch {
+      setArtists([]);
+      setReleases([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="flex min-h-screen flex-col">
+      <Navbar />
+
+      <main className="flex-1">
+        {/* Hero section */}
+        <div className="border-b border-zinc-800 bg-gradient-to-b from-violet-950/20 to-zinc-950 px-4 py-16 text-center">
+          <h1 className="mb-3 text-4xl font-bold tracking-tight sm:text-5xl">
+            Discover New <span className="text-violet-400">Music</span>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="mx-auto mb-8 max-w-lg text-lg text-zinc-400">
+            Search for artists and albums, explore discographies, and build your
+            personal listening list.
           </p>
+          <div className="mx-auto max-w-2xl">
+            <SearchBar onSearch={handleSearch} loading={loading} />
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Results */}
+        <div className="mx-auto max-w-6xl px-4 py-8">
+          {loading && (
+            <div className="flex justify-center py-12">
+              <div className="h-8 w-8 animate-spin rounded-full border-2 border-violet-500 border-t-transparent" />
+            </div>
+          )}
+
+          {!loading && hasSearched && searchType === "artist" && artists.length === 0 && (
+            <p className="py-12 text-center text-zinc-500">
+              No artists found. Try a different search.
+            </p>
+          )}
+
+          {!loading && hasSearched && searchType === "release" && releases.length === 0 && (
+            <p className="py-12 text-center text-zinc-500">
+              No albums found. Try a different search.
+            </p>
+          )}
+
+          {!loading && artists.length > 0 && (
+            <div>
+              <h2 className="mb-4 text-xl font-semibold text-zinc-200">
+                Artists
+              </h2>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {artists.map((artist) => (
+                  <ArtistCard key={artist.id} artist={artist} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {!loading && releases.length > 0 && (
+            <div>
+              <h2 className="mb-4 text-xl font-semibold text-zinc-200">
+                Albums
+              </h2>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {releases.map((release) => (
+                  <AlbumCard
+                    key={release.id}
+                    id={release["release-group"]?.id || release.id}
+                    title={release.title}
+                    artist={
+                      release["artist-credit"]?.[0]?.name || "Unknown Artist"
+                    }
+                    date={release.date}
+                    type={release["release-group"]?.["primary-type"]}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {!hasSearched && (
+            <div className="py-16 text-center">
+              <p className="text-lg text-zinc-600">
+                Search for your favorite artists or albums to get started.
+              </p>
+            </div>
+          )}
         </div>
       </main>
     </div>

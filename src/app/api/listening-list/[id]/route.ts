@@ -1,6 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 
 export async function PATCH(
   request: NextRequest,
@@ -18,7 +18,7 @@ export async function PATCH(
   if (body.rating !== undefined) updates.rating = body.rating;
   if (body.status !== undefined) updates.status = body.status;
 
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("listening_list")
     .update(updates)
     .eq("id", id)
@@ -48,7 +48,7 @@ export async function DELETE(
 
   const { id } = await params;
 
-  const { error } = await supabase
+  const { error } = await getSupabase()
     .from("listening_list")
     .delete()
     .eq("id", id)

@@ -1,6 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 
 export async function GET() {
   const { userId } = await auth();
@@ -8,7 +8,7 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("listening_list")
     .select("*")
     .eq("user_id", userId)
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Check if already in list
-  const { data: existing } = await supabase
+  const { data: existing } = await getSupabase()
     .from("listening_list")
     .select("id")
     .eq("user_id", userId)
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("listening_list")
     .insert({
       user_id: userId,
